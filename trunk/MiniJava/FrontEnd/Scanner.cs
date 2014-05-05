@@ -82,20 +82,18 @@ namespace FrontEnd
                         _previousToken = token;
                         continue;
                     }
-                    if ( (token = CreateReservedKeywordToken(line)) != null )
-                    {
-                        tokens.Add(token);
-                        _previousToken = token;
-                        continue;
-                    }
-
                     if ( (token = CreateOperatorToken(line)) != null )
                     {
                         tokens.Add(token);
                         _previousToken = token;
                         continue;
                     }
-
+                    if ( (token = CreateReservedKeywordToken(line)) != null )
+                    {
+                        tokens.Add(token);
+                        _previousToken = token;
+                        continue;
+                    }
                     if ( (token = CreateTerminalToken(line)) != null )
                     {
                         tokens.Add(token);

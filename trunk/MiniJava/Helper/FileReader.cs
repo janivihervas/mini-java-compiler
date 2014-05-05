@@ -2,7 +2,7 @@
 using System.IO;
 using Exceptions;
 
-namespace File
+namespace Helper
 {
     /// @author Jani Viherväs
     /// @version 27.2.2014

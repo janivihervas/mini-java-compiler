@@ -8,93 +8,106 @@ namespace Grammar
     /// <summary>
     /// Reserved keywords of the grammar
     /// </summary>
-    public class ReservedKeywords
+    public struct ReservedKeywords
     {
-        // TODO: fix
-
         /// <summary>
         /// "assert"
         /// </summary>
         public const string Assert = "assert";
 
         /// <summary>
-        /// "do"
+        /// "="
         /// </summary>
-        public const string Do = "do";
+        public const string Assignment = "=";
+        
+        /// <summary>
+        /// "class"
+        /// </summary>
+        public const string Class = "class";
 
         /// <summary>
-        /// "end"
+        /// "else"
         /// </summary>
-        public const string End = "end";
+        public const string Else = "else";
 
         /// <summary>
-        /// "for"
+        /// "if"
         /// </summary>
-        public const string For = "for";
+        public const string If = "if";
 
         /// <summary>
-        /// "in"
+        /// "main"
         /// </summary>
-        public const string In = "in";
+        public const string Main = "main";
 
         /// <summary>
-        /// "print"
+        /// "new"
         /// </summary>
-        public const string Print = "print";
+        public const string New = "new";
 
         /// <summary>
-        /// "read"
+        /// "out"
         /// </summary>
-        public const string Read = "read";
+        public const string Out = "out";
 
         /// <summary>
-        /// "var"
+        /// "println"
         /// </summary>
-        public const string Var = "var";
-
-
-        /// <summary>
-        /// ":="
-        /// </summary>
-        public const string Assignment = ":=";
+        public const string Println = "println";
 
         /// <summary>
-        /// ":"
+        /// "public"
         /// </summary>
-        public const string Colon = ":";
+        public const string Public = "public";
 
         /// <summary>
-        /// ".."
+        /// "return"
         /// </summary>
-        public const string Range = "..";
+        public const string Return = "return";
 
         /// <summary>
         /// ";"
         /// </summary>
         public const string Semicolon = ";";
 
+        /// <summary>
+        /// "static"
+        /// </summary>
+        public const string Static = "static";
 
         /// <summary>
-        /// Returns all the reserved keywords in an order that doesn't mess up the longest matching rule, i.e. ":=" is before ":". 
-        /// They are also ordered from shortest length to longest.
+        /// "System"
         /// </summary>
-        /// <returns>All the reserved keywords</returns>
+        public const string System = "System";
+
+        /// <summary>
+        /// "this"
+        /// </summary>
+        public const string This = "this";
+
+        /// <summary>
+        /// Returns all the reserved keywords in an order from shortest to longest length
+        /// </summary>
+        /// <returns>All the reserved keywords sorted</returns>
         public static IEnumerable<string> GetReservedKeywords()
         {
             return new[]
                        {
-                           Assignment,
-                           Colon,
                            Semicolon,
-                           Range,
-                           Do,
-                           In,
-                           End,
-                           For,
-                           Var,
-                           Read,
-                           Print,
-                           Assert
+                           Assignment,
+                           If,
+                           New,
+                           Out,
+                           Else,
+                           Main,
+                           This,
+                           Class,
+                           Assert,
+                           Public,
+                           Return,
+                           Static,
+                           System,
+                           Println
                        };
         }
     }

@@ -8,63 +8,66 @@ namespace Grammar
     /// <summary>
     /// Operators of the grammar
     /// </summary>
-    public class Operators
+    public struct Operators
     {
-        //TODO: fix
-
         #region Arithmetic operators
 
         /// <summary>
-        /// Plus operator
+        /// +
         /// </summary>
         public const string Plus = "+";
 
         /// <summary>
-        /// Minus operator
+        /// -
         /// </summary>
         public const string Minus = "-";
 
         /// <summary>
-        /// Divide operator
+        /// /
         /// </summary>
         public const string Divide = "/";
 
         /// <summary>
-        /// Multiply operator
+        /// *
         /// </summary>
         public const string Multiply = "*";
+
+        /// <summary>
+        /// %
+        /// </summary>
+        public const string Remainder = "%";
 
         #endregion
 
         #region Comparison
 
         /// <summary>
-        /// Lesser than operator
+        /// &lt;
         /// </summary>
         public const string LesserThan = "<";
 
         /// <summary>
-        /// Lesser or equal than operator
+        /// &lt;=
         /// </summary>
         public const string LesserOrEqualThan = "<=";
 
         /// <summary>
-        /// Greater than operator
+        /// >
         /// </summary>
         public const string GreaterThan = ">";
 
         /// <summary>
-        /// Greater or equal than operator
+        /// >=
         /// </summary>
         public const string GreaterOrEqualThan = ">=";
 
         /// <summary>
-        /// Equal operator
+        /// ==
         /// </summary>
-        public const string Equal = "=";
+        public const string Equal = "==";
 
         /// <summary>
-        /// Not equal operator
+        /// !=
         /// </summary>
         public const string NotEqual = "!=";
 
@@ -73,27 +76,56 @@ namespace Grammar
         #region Logical
 
         /// <summary>
-        /// Logical and operator
+        /// &&
         /// </summary>
-        public const string And = "&";
+        public const string And = "&&";
 
         /// <summary>
-        /// Logical not operator
+        /// ||
+        /// </summary>
+        public const string Or = "||";
+
+        /// <summary>
+        /// !
         /// </summary>
         public const string Not = "!";
 
         #endregion
 
         /// <summary>
-        /// Left parenthesis
+        /// (
         /// </summary>
         public const string ParenthesisLeft = "(";
 
         /// <summary>
-        /// Right parenthesis
+        /// )
         /// </summary>
         public const string ParenthesisRight = ")";
 
+        /// <summary>
+        /// {
+        /// </summary>
+        public const string BraceLeft = "{";
+
+        /// <summary>
+        /// }
+        /// </summary>
+        public const string BraceRight = "}";
+
+        /// <summary>
+        /// [
+        /// </summary>
+        public const string BracketLeft = "[";
+
+        /// <summary>
+        /// ]
+        /// </summary>
+        public const string BracketRight = "]";
+
+        /// <summary>
+        /// .
+        /// </summary>
+        public const string Dot = ".";
 
         /// <summary>
         /// Returns all the operators in an order that doesn't mess up the longest matching rule, i.e. ">=" is before ">".
@@ -103,11 +135,27 @@ namespace Grammar
         {
             return new[]
                        {
-                           Plus, Minus, Multiply, Divide,
-                           ParenthesisLeft, ParenthesisRight,
-                           GreaterOrEqualThan, LesserOrEqualThan,
-                           GreaterThan, LesserThan, NotEqual, Equal,
-                           And, Not,
+                           And,
+                           BraceLeft,
+                           BraceRight,
+                           BracketLeft,
+                           BracketRight,
+                           Divide,
+                           Dot,
+                           Equal,
+                           GreaterOrEqualThan,
+                           GreaterThan,
+                           LesserOrEqualThan,
+                           LesserThan,
+                           Minus,
+                           Multiply,
+                           NotEqual,
+                           Not,
+                           Or,
+                           ParenthesisLeft,
+                           ParenthesisRight,
+                           Plus,
+                           Remainder
                        };
         }
     }

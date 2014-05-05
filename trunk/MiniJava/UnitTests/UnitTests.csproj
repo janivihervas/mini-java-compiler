@@ -50,10 +50,6 @@
       <Project>{d525b7fb-a70c-4fb5-acf8-d2f0bd367635}</Project>
       <Name>Exceptions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\File\File.csproj">
-      <Project>{90edde41-832c-4750-af9c-8dce3a57b717}</Project>
-      <Name>File</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FrontEnd\FrontEnd.csproj">
       <Project>{f3ea8d15-f240-45d9-a091-7934a738fbf8}</Project>
       <Name>FrontEnd</Name>
@@ -61,6 +57,10 @@
     <ProjectReference Include="..\Grammar\Grammar.csproj">
       <Project>{45d20326-aef2-4b1d-92cc-26f245ed4e4e}</Project>
       <Name>Grammar</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helper\Helper.csproj">
+      <Project>{c024458a-6545-480a-b63f-f1dd5b227e00}</Project>
+      <Name>Helper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

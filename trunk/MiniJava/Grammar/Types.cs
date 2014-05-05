@@ -8,7 +8,7 @@ namespace Grammar
     /// <summary>
     /// Types in the grammar
     /// </summary>
-    public class Types
+    public struct Types
     {
         /// <summary>
         /// Boolean type
