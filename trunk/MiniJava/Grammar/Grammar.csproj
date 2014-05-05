@@ -43,7 +43,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReservedKeywords.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="TokenError.cs" />
+    <Compile Include="TokenIdentifier.cs" />
+    <Compile Include="TokenTerminal.cs" />
     <Compile Include="Types.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Exceptions\Exceptions.csproj">
+      <Project>{D525B7FB-A70C-4FB5-ACF8-D2F0BD367635}</Project>
+      <Name>Exceptions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
