@@ -28,10 +28,12 @@ Keywords={compiler, Mini-Java, Code Generation}
 \newcommand{\bb}[1]{\textbf{#1}}
 \newcommand{\ttt}[1]{\texttt{#1}}
 \newcommand{\e}{\epsilon}
-\newcommand{\s}{\ttt{ }}
+\newcommand{\s}{\text{ }}
 \newcommand{\integer}{\ttt{i}}
 \newcommand{\str}{\ttt{s}}
 \newcommand{\bool}{\ttt{b}}
+\newcommand{\bracel}{\textbraceleft}
+\newcommand{\bracer}{\textbraceright}
 
 
 \begin{document}
@@ -60,5 +62,49 @@ Jani Viherväs\\
 
 \section{Overview}
 
+\section{Grammar}
+
+\begin{align*}
+<program>\s \to \s &<main\s class> <class\s declaration>* \\
+<main\s class>\s \to \s &\bb{class} <identifier> \bb{\bracel public static void main() \bracel} <statement>* \bb{\bracer \bracer}\\
+<class\s declaration>\s \to \s &\bb{class} <identifier> [\bb{extends} <identifier>] \bb{\bracel}<declaration>* \bb{\bracer}\\
+<declaration>\s \to \s &<variable\s declaration> | <method\s declaration> \\ 
+% \vspace{-2mm}\\
+\hline
+<method\s declaration>\s \to \s &\bb{public} <type> <identifier> \bb{(} [ <formals> ] \bb{) \bracel} <statement>* \bb{\bracer}\\
+<variable\s declaration>\s \to \s &<type> <identifier> \bb{;}\\
+<formals>\s \to \s &<type> <identifier> ( \bb{,} <type> <identifier> )*\\
+<type>\s \to \s &<simple\s type> \mid <array\s type>\\
+<simple\s type>\s \to \s &\bb{int} \mid \bb{boolean} \mid \bb{void} \mid <type\s identifier>\\
+<array\s type>\s \to \s &<simple\s type> \bb{[ ]}\\
+<type\s identifier>\s \to \s &<identifier> \\
+% \vspace{-2mm}\\
+\hline
+<statement>\s \to \s &\bb{assert (} <expr> \bb{)}  \\
+             \mid \s &<variable\s declaration>  \\
+             \mid \s &\bb{\bracel <statement>* \bracer}  \\
+             \mid \s &\bb{if (} <expr> \bb{)} <statement> <else> \\
+             \mid \s &\bb{while (} <expr> \bb{)} <statement>  \\
+             \mid \s &\bb{System.out.println (} <expr> \bb{);}  \\
+             \mid \s &<lvalue> \bb{=} <expr> \bb{;}  \\
+             \mid \s &\bb{return} <expr> \bb{;}  \\
+             \mid \s &<method\s invocation> \bb{;} \\
+<else>\s \to \s &\epsilon \mid \bb{else} <statement> \\
+<method\s invocation>\s \to \s &<expr> \bb{.} <identifier> \bb{(} [ <expr> (\bb{,} <expr>)* ] \bb{)} \\
+<lvalue>\s \to \s &<expr> \\
+% \vspace{-2mm}\\
+\hline
+<expr>\s \to \s &<expr> <binary\s operator> <expr> \\
+    \mid \s    &<expr> \bb{[} <expr> \bb{]} \\
+    \mid \s    &<expr> \bb{.}\ttt{length} \\
+    \mid \s    &\bb{new} <new>\\
+    \mid \s    &\bb{!} <expr> \\
+    \mid \s    &\bb{(} <expr> \bb{)} \\
+    \mid \s    &<identifier> \mid <integer\s literal> \\
+    \mid \s    &\bb{this} \mid \bb{true} \mid \bb{false} \\
+    \mid \s    &<method\s invocation> \\
+<new>\s \to \s &<simple\s type> \bb{\bracel} <expr> \bb{\bracer} \mid <type\s identifier> \bb{( )} \\ 
+<binary\s operator>\s \to \s & \&\& \mid || \mid < \mid > \mid == \mid + \mid - \mid * \mid / \mid \% 
+\end{align*}
 
 \end{document}
