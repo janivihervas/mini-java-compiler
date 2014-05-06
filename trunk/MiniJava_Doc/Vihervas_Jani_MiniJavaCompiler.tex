@@ -72,7 +72,8 @@ Jani Viherväs\\
 % \vspace{-2mm}\\
 \hline
 <method\s declaration>\s \to \s &\bb{public} <type> <identifier> \bb{(} [ <formals> ] \bb{) \bracel} <statement>* \bb{\bracer}\\
-<variable\s declaration>\s \to \s &<type> <identifier> \bb{;}\\
+<variable\s declaration>\s \to \s &<type> <identifier> <variable\s assignment>\bb{;}\\
+<variable\s assignment>\s \to \s &\epsilon \mid <expr>\\
 <formals>\s \to \s &<type> <identifier> ( \bb{,} <type> <identifier> )*\\
 <type>\s \to \s &<simple\s type> \mid <array\s type>\\
 <simple\s type>\s \to \s &\bb{int} \mid \bb{boolean} \mid \bb{void} \mid <type\s identifier>\\
@@ -86,23 +87,22 @@ Jani Viherväs\\
              \mid \s &\bb{if (} <expr> \bb{)} <statement> <else> \\
              \mid \s &\bb{while (} <expr> \bb{)} <statement>  \\
              \mid \s &\bb{System.out.println (} <expr> \bb{);}  \\
-             \mid \s &<lvalue> \bb{=} <expr> \bb{;}  \\
+             \mid \s &<identifier> \bb{=} <expr> \bb{;}  \\
              \mid \s &\bb{return} <expr> \bb{;}  \\
              \mid \s &<method\s invocation> \bb{;} \\
 <else>\s \to \s &\epsilon \mid \bb{else} <statement> \\
 <method\s invocation>\s \to \s &<expr> \bb{.} <identifier> \bb{(} [ <expr> (\bb{,} <expr>)* ] \bb{)} \\
-<lvalue>\s \to \s &<expr> \\
 % \vspace{-2mm}\\
 \hline
-<expr>\s \to \s &<expr> <binary\s operator> <expr> \\
-    \mid \s    &<expr> \bb{[} <expr> \bb{]} \\
-    \mid \s    &<expr> \bb{.}\ttt{length} \\
-    \mid \s    &\bb{new} <new>\\
+<expr>\s \to \s &<expr1><expr2> \\
+<expr1>\s \to \s &\bb{new} <new>\\
     \mid \s    &\bb{!} <expr> \\
     \mid \s    &\bb{(} <expr> \bb{)} \\
     \mid \s    &<identifier> \mid <integer\s literal> \\
     \mid \s    &\bb{this} \mid \bb{true} \mid \bb{false} \\
     \mid \s    &<method\s invocation> \\
+<expr2>\s \to \s &\epsilon \mid \bb{[} <expr> \bb{]} \mid \bb{.length}\\
+    \mid \s    &<binary\s operator> <expr> \\
 <new>\s \to \s &<simple\s type> \bb{\bracel} <expr> \bb{\bracer} \mid <type\s identifier> \bb{( )} \\ 
 <binary\s operator>\s \to \s & \&\& \mid || \mid < \mid > \mid == \mid + \mid - \mid * \mid / \mid \% 
 \end{align*}
