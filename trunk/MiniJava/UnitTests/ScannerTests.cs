@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FrontEnd;
 using Grammar;
 using Helper;
@@ -27,7 +29,7 @@ namespace UnitTests
         [Test]
         public void TestSampleProgramIsTokenized()
         {
-            var s = @"
+            const string s = @"
 class Factorial {
   public static void main () {
     System.out.println (new Fac ().ComputeFac (10));
@@ -153,20 +155,74 @@ class Fac {
             Assert.IsTrue(tokens[70] is TokenIdentifier);
             Assert.IsTrue(tokens[76] is TokenIdentifier);
         }
-        
+
+        [Test]
+        public void TestEveryReservedKeyword()
+        {
+            var fields = typeof(ReservedKeywords).GetFields();
+            var keywords = fields.Select(field => field.GetValue(null) as string).ToList();
+
+            var tokens = _scanner.Tokenize(keywords);
+
+            Assert.AreEqual(keywords.Count, tokens.Count);
+
+            for ( var i = 0; i < tokens.Count; i++ )
+            {
+                Assert.AreEqual(keywords[i], tokens[i].Lexeme);
+                Assert.IsFalse(tokens[i] is TokenIdentifier);
+                Assert.IsFalse(tokens[i] is TokenTerminal<int>);
+                Assert.IsFalse(tokens[i] is TokenTerminal<bool>);
+            }
+        }
+
+        [Test]
+        public void TestEveryOperator()
+        {
+            var fields = typeof(ReservedKeywords).GetFields();
+            var operators = fields.Select(field => field.GetValue(null) as string).ToList();
+            var tokens = _scanner.Tokenize(operators);
+
+            Assert.AreEqual(operators.Count, tokens.Count);
+
+            for ( var i = 0; i < tokens.Count; i++ )
+            {
+                Assert.AreEqual(operators[i], tokens[i].Lexeme);
+                Assert.IsFalse(tokens[i] is TokenIdentifier);
+                Assert.IsFalse(tokens[i] is TokenTerminal<int>);
+                Assert.IsFalse(tokens[i] is TokenTerminal<bool>);
+            }
+        }
+
+        [Test]
+        public void TestEveryType()
+        {
+            var fields = typeof(ReservedKeywords).GetFields();
+            var types = fields.Select(field => field.GetValue(null) as string).ToList();
+            var tokens = _scanner.Tokenize(types);
+
+            Assert.AreEqual(types.Count, tokens.Count);
+
+            for ( var i = 0; i < tokens.Count; i++ )
+            {
+                Assert.AreEqual(types[i], tokens[i].Lexeme);
+                Assert.IsFalse(tokens[i] is TokenIdentifier);
+                Assert.IsFalse(tokens[i] is TokenTerminal<int>);
+                Assert.IsFalse(tokens[i] is TokenTerminal<bool>);
+            }
+        }
+
         [Test]
         public void TestScannerCanTokenizeSimpleTypes()
         {
             var lines = new List<string>
                             {
                                 "public void test() {",
-                                "int x;",
-                                "boolean y;",
+                                "int x = 1;",
+                                "boolean y = true;",
                                 "}"
                             };
 
             var tokens = _scanner.Tokenize(lines);
-
             Assert.IsTrue(3 <= tokens.Count);
 
             Assert.IsTrue(tokens.Exists(x =>
@@ -182,7 +238,7 @@ class Fac {
                               ));
 
             Assert.IsTrue(tokens.Exists(x =>
-                                  x.Lexeme == Types.Bool &&
+                                  x.Lexeme == Types.Boolean &&
                                   x.Line == 3 &&
                                   x.StartColumn == 1
                               ));
@@ -197,6 +253,7 @@ class Fac {
                 Assert.AreEqual(expected[i], actual[i].Lexeme);
             }
         }
+
 
     }
 }

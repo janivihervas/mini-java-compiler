@@ -31,9 +31,19 @@ namespace Grammar
         public const string Else = "else";
 
         /// <summary>
+        /// extends
+        /// </summary>
+        public const string Extends = "extends";
+
+        /// <summary>
         /// "if"
         /// </summary>
         public const string If = "if";
+
+        /// <summary>
+        /// length
+        /// </summary>
+        public const string Length = "length";
 
         /// <summary>
         /// "main"
@@ -86,6 +96,11 @@ namespace Grammar
         public const string This = "this";
 
         /// <summary>
+        /// while
+        /// </summary>
+        public const string While = "while";
+
+        /// <summary>
         /// Returns all the reserved keywords in an order from shortest to longest length
         /// </summary>
         /// <returns>All the reserved keywords sorted</returns>
@@ -102,11 +117,14 @@ namespace Grammar
                            Main,
                            This,
                            Class,
+                           While,
                            Assert,
+                           Length,
                            Public,
                            Return,
                            Static,
                            System,
+                           Extends,
                            Println
                        };
         }

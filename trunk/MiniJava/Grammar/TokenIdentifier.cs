@@ -25,8 +25,9 @@ namespace Grammar
         public TokenIdentifier(int line, int startColumn, string identifier)
             : base(line, startColumn, identifier)
         {
-            if ( ReservedKeywords.GetReservedKeywords().Contains(identifier) || Types.GetTypes().Contains(identifier) )
-            {
+            if ( ReservedKeywords.GetReservedKeywords().Contains(identifier) || Types.GetTypes().Contains(identifier) ||
+                identifier == "true" || identifier == "false") // Have to do this and remove true and false from ReservedKeywords, because
+            {                                                  // otherwise they wouldn't be scanned as TokenTerminal<bool>
                 throw new GrammarException("Can't assign reserved keyword as an identifier.");
             }
             Identifier = identifier;

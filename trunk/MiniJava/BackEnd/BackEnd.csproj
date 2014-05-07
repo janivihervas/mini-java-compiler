@@ -47,6 +47,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FrontEnd\FrontEnd.csproj">
+      <Project>{F3EA8D15-F240-45D9-A091-7934A738FBF8}</Project>
+      <Name>FrontEnd</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Grammar\Grammar.csproj">
+      <Project>{45D20326-AEF2-4B1D-92CC-26F245ED4E4E}</Project>
+      <Name>Grammar</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

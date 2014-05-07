@@ -44,6 +44,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Exceptions\Exceptions.csproj">
+      <Project>{d525b7fb-a70c-4fb5-acf8-d2f0bd367635}</Project>
+      <Name>Exceptions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Grammar\Grammar.csproj">
       <Project>{45d20326-aef2-4b1d-92cc-26f245ed4e4e}</Project>
       <Name>Grammar</Name>

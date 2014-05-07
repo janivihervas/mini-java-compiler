@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Exceptions;
 using Grammar;
 
@@ -13,6 +14,7 @@ namespace FrontEnd
     /// </summary>
     public class Parser
     {
+        // TODO: add follow sets for every skip
         private int _i;
         private List<Token> _tokens;
         private List<Error> _syntaxErrors;
@@ -34,6 +36,13 @@ namespace FrontEnd
             _tokens = tokens;
             _i = 0;
             //var rootNode = Statements();
+            try
+            {
+                Program();
+            }
+            catch (GrammarException)
+            {
+            }
             if ( 0 < _syntaxErrors.Count )
             {
                 throw new GrammarException(_syntaxErrors);
@@ -67,16 +76,46 @@ namespace FrontEnd
                        : null;
         }
 
+        /// <summary>
+        /// Checks the token for null reference and correct lexeme
+        /// </summary>
+        /// <param name="token">Token to check</param>
+        /// <param name="lexeme">Lexeme expected</param>
+        private bool CheckToken(Token token, params string[] lexeme)
+        {
+            return token != null && lexeme.Any(s => token.Lexeme == s);
+        }
 
         /// <summary>
         /// Checks the token for null reference and correct lexeme
         /// </summary>
-        /// <param name="token">Current token</param>
         /// <param name="lexeme">Lexeme expected</param>
-        /// <returns>True if ok</returns>
-        public static bool CheckToken(Token token, string lexeme)
+        /// <param name="followSet">Follow set to skip to </param>
+        private void CheckTokenAndSkip(string lexeme, params string[] followSet)
         {
-            return token != null && token.Lexeme == lexeme;
+            var token = NextToken();
+            if (!CheckToken(token, lexeme))
+            {
+                AddSyntaxError(token, lexeme);
+            }
+            SkipTokens(followSet);
+        }
+
+        /// <summary>
+        /// Skips tokens until one with the lexeme that is in the follow set is found
+        /// </summary>
+        /// <param name="followSet">Follow set</param>
+        private void SkipTokens(params string[] followSet)
+        {
+            if (followSet.Length < 1)
+            {
+                return;
+            }
+            _i--;
+            while ( _i < _tokens.Count && !followSet.Contains(CurrentToken().Lexeme) )
+            {
+                _i++;
+            }
         }
 
 
@@ -106,5 +145,439 @@ namespace FrontEnd
 
             }
         }
+
+        /// <summary>
+        /// Check if the token is type token
+        /// </summary>
+        /// <param name="token">Token to check</param>
+        /// <returns>True if the token is a type token</returns>
+        private bool IsTypeToken(Token token)
+        {
+            if ( IsSimpleTypeToken(token) )
+            {
+                return true;
+            }
+            if (token is TokenIdentifier)
+            {
+                return IsTypeIdentifier(token.Lexeme);
+            }
+            return false;
+        }
+
+        private bool IsSimpleTypeToken(Token token)
+        {
+            return CheckToken(token, Types.Int, Types.Boolean, Types.Void);
+        }
+
+        private bool IsTypeIdentifier(string identifier)
+        {
+            // TODO: implement
+            return true;
+        }
+
+
+        private void Program()
+        {
+            MainClass();
+            while (_i < _tokens.Count)
+            {
+                ClassDeclaration();
+            }
+        }
+
+        private void MainClass()
+        {
+            CheckTokenAndSkip(ReservedKeywords.Class);
+            NewIdentifier();
+            CheckTokenAndSkip(Operators.BraceLeft);
+            CheckTokenAndSkip(ReservedKeywords.Public);
+            CheckTokenAndSkip(ReservedKeywords.Static);
+            CheckTokenAndSkip(Types.Void);
+            CheckTokenAndSkip(ReservedKeywords.Main);
+            CheckTokenAndSkip(Operators.ParenthesisLeft);
+            CheckTokenAndSkip(Operators.ParenthesisRight);
+            CheckTokenAndSkip(Operators.BraceLeft);
+            while ( !CheckToken(CurrentToken(), Operators.BraceRight) )
+            {
+                Statement();
+            }
+            NextToken();
+            CheckTokenAndSkip(Operators.BraceRight);
+        }
+
+        private void ClassDeclaration()
+        {
+            CheckTokenAndSkip(ReservedKeywords.Class);
+            NewIdentifier();
+            if (CheckToken(CurrentToken(), ReservedKeywords.Extends))
+            {
+                NextToken();
+                Identifier();
+            }
+            CheckTokenAndSkip(Operators.BraceLeft);
+            while ( !CheckToken(CurrentToken(), Operators.BraceRight) )
+            {
+                Declaration();
+            }
+            NextToken();
+        }
+
+        private void Declaration()
+        {
+            if (CheckToken(CurrentToken(), ReservedKeywords.Public))
+            {
+                MethodDeclaration();
+            }
+            else
+            {
+                VariableDeclaration();
+            }
+        }
+
+        private void MethodDeclaration()
+        {
+            CheckTokenAndSkip(ReservedKeywords.Public);
+            TypeProduction();
+            NewIdentifier();
+            CheckTokenAndSkip(Operators.ParenthesisLeft);
+            if (!CheckToken(CurrentToken(), Operators.ParenthesisRight))
+            {
+                Formals();
+            }
+            CheckTokenAndSkip(Operators.ParenthesisRight);
+            CheckTokenAndSkip(Operators.BraceLeft);
+            while ( !CheckToken(CurrentToken(), Operators.BraceRight) )
+            {
+                Statement();
+            }
+            NextToken();
+        }
+
+        private void VariableDeclaration()
+        {
+            TypeProduction();
+            NewIdentifier();
+            VariableAssignment();
+            CheckTokenAndSkip(ReservedKeywords.Semicolon);
+        }
+
+        private void VariableAssignment()
+        {
+            if (CheckToken(CurrentToken(), ReservedKeywords.Semicolon)) // epsilon
+            {
+                return;
+            }
+            CheckTokenAndSkip(ReservedKeywords.Assignment);
+            Expr();
+        }
+
+        private void Formals()
+        {
+            do
+            {
+                TypeProduction();
+                NewIdentifier();
+                if (!CheckToken(CurrentToken(), Operators.ParenthesisRight))
+                {
+                    CheckTokenAndSkip(Operators.Comma);
+                }
+            } while (!CheckToken(CurrentToken(), Operators.ParenthesisRight));
+            NextToken();
+        }
+
+        private void TypeProduction()
+        {
+            SimpleType();
+            ArrayType();
+        }
+
+        private void SimpleType()
+        {
+            var token = NextToken();
+            if (token == null)
+            {
+                AddSyntaxError(null, "int, boolean, void or identifier");
+                return;
+            }
+            switch (token.Lexeme) 
+            {
+                case Types.Int:
+                    {
+                        return;
+                    }
+                case Types.Boolean:
+                    {
+                        return;
+                    }
+                case Types.Void:
+                    {
+                        return;
+                    }
+            }
+            _i--;
+            TypeIdentifier();
+        }
+
+        private void ArrayType()
+        {
+            if (!CheckToken(CurrentToken(), Operators.BracketLeft)) return; // epsilon
+            NextToken();
+            CheckTokenAndSkip(Operators.BracketRight);
+        }
+
+        private void TypeIdentifier()
+        {
+            Identifier();
+        }
+
+        private void Statement()
+        {
+            var token = NextToken();
+            if ( token == null )
+            {
+                AddSyntaxError(null, "assert, variable declaration or assignment, nested statements, if, while, print, return or method invocation statement");
+                return;
+            }
+            switch (token.Lexeme)
+            {
+                case ReservedKeywords.Assert:
+                    {
+                        CheckTokenAndSkip(Operators.ParenthesisLeft);
+                        Expr();
+                        CheckTokenAndSkip(Operators.ParenthesisRight);
+                        return;
+                    }
+                case Operators.BraceLeft:
+                    {
+                        _i--;
+                        while (!CheckToken(NextToken(), Operators.BraceRight))
+                        {
+                            Statement();
+                        }
+                        NextToken();
+                        return;
+                    }
+                case ReservedKeywords.If:
+                    {
+                        CheckTokenAndSkip(Operators.ParenthesisLeft);
+                        Expr();
+                        CheckTokenAndSkip(Operators.ParenthesisRight);
+                        Statement();
+                        Else();
+                        return;
+                    }
+                case ReservedKeywords.While:
+                    {
+                        CheckTokenAndSkip(Operators.ParenthesisLeft);
+                        Expr();
+                        CheckTokenAndSkip(Operators.ParenthesisRight);
+                        Statement();
+                        return;
+                    }
+                case ReservedKeywords.System:
+                    {
+                        CheckTokenAndSkip(Operators.Dot);
+                        CheckTokenAndSkip(ReservedKeywords.Out);
+                        CheckTokenAndSkip(Operators.Dot);
+                        CheckTokenAndSkip(ReservedKeywords.Println);
+                        CheckTokenAndSkip(Operators.ParenthesisLeft);
+                        Expr();
+                        CheckTokenAndSkip(Operators.ParenthesisRight);
+                        CheckTokenAndSkip(ReservedKeywords.Semicolon);
+                        return;
+                    }
+                case ReservedKeywords.Return: 
+                    {
+                        Expr();
+                        CheckTokenAndSkip(ReservedKeywords.Semicolon);
+                        if (!CheckToken(token, Operators.BraceRight))
+                        {
+                            // TODO: add error because of unreachable code after return
+                            SkipTokens(Operators.BraceRight);
+                        }
+                        return;
+                    }
+            }
+            if (IsTypeToken(token))
+            {
+                LocalVariableDeclaration();
+                return;
+            }
+            if (token is TokenIdentifier && CheckToken(CurrentToken(), ReservedKeywords.Assignment))
+            {
+                Identifier();
+                NextToken(); // CurrentToken = token + 1, already checked in the condition
+                Expr();
+                CheckTokenAndSkip(ReservedKeywords.Semicolon);
+                return;
+            }
+            _i--;
+            MethodInvocation();
+            CheckTokenAndSkip(ReservedKeywords.Semicolon);
+        }
+
+        private void Else()
+        {
+            if (!CheckToken(CurrentToken(), ReservedKeywords.Else)) return; // epsilon
+            NextToken();
+            Statement();
+        }
+
+        private void LocalVariableDeclaration()
+        {
+            VariableDeclaration();
+        }
+
+        private void MethodInvocation()
+        {
+            Expr();
+            CheckTokenAndSkip(Operators.Dot);
+            Identifier();
+            CheckTokenAndSkip(Operators.ParenthesisLeft);
+            while (!CheckToken(CurrentToken(), Operators.ParenthesisRight))
+            {
+                Expr();
+                if (!CheckToken(CurrentToken(), Operators.ParenthesisRight))
+                {
+                    CheckTokenAndSkip(Operators.Comma);
+                }
+            }
+            NextToken();
+        }
+
+        private void Expr()
+        {
+            Expr1();
+            Expr2();
+        }
+
+        private void Expr1()
+        {
+            var token = NextToken();
+            if (token == null)
+            {
+                AddSyntaxError(null, "new, !, (, this, boolean or integer value or method invocation");
+                return;
+            }
+            switch (token.Lexeme)
+            {
+                case ReservedKeywords.New:
+                    {
+                        New();
+                        return;
+                    }
+                case Operators.Not:
+                    {
+                        Expr();
+                        return;
+                    }
+                case Operators.ParenthesisLeft:
+                    {
+                        Expr();
+                        CheckTokenAndSkip(Operators.ParenthesisRight);
+                        return;
+                    }
+                case ReservedKeywords.This:
+                    {
+                        return;
+                    }
+            }
+            if (token is TokenTerminal<int>)
+            {
+                return;
+            }
+            if (token is TokenTerminal<bool>)
+            {
+                return;
+            }
+            _i--;
+            MethodInvocation();
+        }
+
+        private void Expr2()
+        {
+            var token = NextToken();
+            if (CheckToken(token, Operators.ParenthesisRight, ReservedKeywords.Semicolon, Operators.BracketRight)) // epsilon
+            {
+                return;
+            }
+            if (token == null)
+            {
+                AddSyntaxError(null, "new, !, (, this, boolean or integer value or method invocation");
+                return;
+            }
+
+            switch (token.Lexeme)
+            {
+                case Operators.BracketLeft:
+                    {
+                        Expr();
+                        CheckTokenAndSkip(Operators.BracketRight);
+                        return;
+                    }
+                case Operators.Dot:
+                    {
+                        if (CurrentToken() is TokenIdentifier) // method invocation
+                        {
+                            _i--;
+                            return;
+                        }
+                        CheckTokenAndSkip(ReservedKeywords.Length);
+                        return;
+                    }
+            }
+            BinaryOperator();
+        }
+
+        private void New()
+        {
+            if (IsSimpleTypeToken(CurrentToken()))
+            {
+                SimpleType();
+                CheckTokenAndSkip(Operators.BracketLeft);
+                Expr();
+                CheckTokenAndSkip(Operators.BracketRight);
+                return;
+            }
+            TypeIdentifier();
+            CheckTokenAndSkip(Operators.ParenthesisLeft);
+            CheckTokenAndSkip(Operators.ParenthesisRight);
+        }
+
+        private void BinaryOperator()
+        {
+            var token = NextToken();
+            if ( !CheckToken(token, Operators.GetBinaryOperators()) )
+            {
+                AddSyntaxError(token, "binary operator");
+                return;
+            }
+            Expr();
+        }
+
+        /// <summary>
+        /// Adds a new identifier to the symbol table
+        /// </summary>
+        private void NewIdentifier()
+        {
+            var token = NextToken() as TokenIdentifier;
+            if ( token == null )
+            {
+                AddSyntaxError(null, "identifier");
+            }
+        }
+
+        /// <summary>
+        /// Finds an identifier from the symbol table
+        /// </summary>
+        private void Identifier()
+        {
+            var token = NextToken() as TokenIdentifier;
+            if (token == null)
+            {
+                AddSyntaxError(null, "identifier");
+            }
+        }
+
     }
 }

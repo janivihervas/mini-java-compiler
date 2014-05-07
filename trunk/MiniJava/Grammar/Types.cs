@@ -13,7 +13,7 @@ namespace Grammar
         /// <summary>
         /// Boolean type
         /// </summary>
-        public const string Bool = "bool";
+        public const string Boolean = "boolean";
 
         /// <summary>
         /// Integer type
@@ -31,7 +31,7 @@ namespace Grammar
         /// <returns>All the types</returns>
         public static IEnumerable<string> GetTypes()
         {
-            return new[] { Int, Bool, Void };
+            return new[] { Int, Boolean, Void };
         }
     }
 }

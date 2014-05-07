@@ -128,6 +128,12 @@ namespace Grammar
         public const string Dot = ".";
 
         /// <summary>
+        /// ,
+        /// </summary>
+        public const string Comma = ",";
+
+
+        /// <summary>
         /// Returns all the operators in an order that doesn't mess up the longest matching rule, i.e. ">=" is before ">".
         /// </summary>
         /// <returns>All the operators</returns>
@@ -140,6 +146,7 @@ namespace Grammar
                            BraceRight,
                            BracketLeft,
                            BracketRight,
+                           Comma,
                            Divide,
                            Dot,
                            Equal,
@@ -158,5 +165,29 @@ namespace Grammar
                            Remainder
                        };
         }
+
+
+        /// <summary>
+        /// Gets all the binary operators
+        /// </summary>
+        /// <returns>The binary operators</returns>
+        public static string[] GetBinaryOperators()
+        {
+            return new[]
+                       {
+                           And,
+                           Or,
+                           LesserThan,
+                           LesserOrEqualThan,
+                           GreaterThan,
+                           GreaterOrEqualThan,
+                           Equal,
+                           Plus,
+                           Minus,
+                           Multiply,
+                           Divide,
+                           Remainder
+                       };
+        } 
     }
 }
