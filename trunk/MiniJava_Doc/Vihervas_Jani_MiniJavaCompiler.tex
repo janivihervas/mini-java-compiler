@@ -63,26 +63,26 @@ Jani Viherväs\\
 \section{Overview}
 
 \section{Grammar}
-
+\begingroup\footnotesize
 \begin{align*}
 <program>\s \to \s &<main\s class> <class\s declaration>* \\
-<main\s class>\s \to \s &\bb{class} <identifier> \bb{\bracel public static void main() \bracel} <statement>* \bb{\bracer \bracer}\\
-<class\s declaration>\s \to \s &\bb{class} <identifier> [\bb{extends} <identifier>] \bb{\bracel}<declaration>* \bb{\bracer}\\
+<main\s class>\s \to \s &\bb{class} <new\s identifier> \bb{\bracel public static void main() \bracel} <statement>* \bb{\bracer \bracer}\\
+<class\s declaration>\s \to \s &\bb{class} <new\s identifier> [\bb{extends} <identifier>] \bb{\bracel}<declaration>* \bb{\bracer}\\
 <declaration>\s \to \s &<variable\s declaration> | <method\s declaration> \\ 
 % \vspace{-2mm}\\
 \hline
-<method\s declaration>\s \to \s &\bb{public} <type> <identifier> \bb{(} [ <formals> ] \bb{) \bracel} <statement>* \bb{\bracer}\\
-<variable\s declaration>\s \to \s &<type> <identifier> <variable\s assignment>\bb{;}\\
-<variable\s assignment>\s \to \s &\epsilon \mid <expr>\\
-<formals>\s \to \s &<type> <identifier> ( \bb{,} <type> <identifier> )*\\
-<type>\s \to \s &<simple\s type> \mid <array\s type>\\
+<method\s declaration>\s \to \s &\bb{public} <type> <new\s identifier> \bb{(} [ <formals> ] \bb{) \bracel} <statement>* \bb{\bracer}\\
+<variable\s declaration>\s \to \s &<type> <new\s identifier> <variable\s assignment>\bb{;}\\
+<variable\s assignment>\s \to \s &\epsilon \mid = <expr>\\
+<formals>\s \to \s &<type> <new\s identifier> ( \bb{,} <type> <new\s identifier> )*\\
+<type>\s \to \s &<simple\s type> <array\s type>\\
 <simple\s type>\s \to \s &\bb{int} \mid \bb{boolean} \mid \bb{void} \mid <type\s identifier>\\
-<array\s type>\s \to \s &<simple\s type> \bb{[ ]}\\
+<array\s type>\s \to \s &\epsilon \mid \bb{[ ]}\\
 <type\s identifier>\s \to \s &<identifier> \\
 % \vspace{-2mm}\\
 \hline
 <statement>\s \to \s &\bb{assert (} <expr> \bb{)}  \\
-             \mid \s &<variable\s declaration>  \\
+             \mid \s &<local\s variable\s declaration>  \\
              \mid \s &\bb{\bracel <statement>* \bracer}  \\
              \mid \s &\bb{if (} <expr> \bb{)} <statement> <else> \\
              \mid \s &\bb{while (} <expr> \bb{)} <statement>  \\
@@ -91,6 +91,7 @@ Jani Viherväs\\
              \mid \s &\bb{return} <expr> \bb{;}  \\
              \mid \s &<method\s invocation> \bb{;} \\
 <else>\s \to \s &\epsilon \mid \bb{else} <statement> \\
+<local\s variable\s declaration> \s \to \s &<variable\s declaration> \\
 <method\s invocation>\s \to \s &<expr> \bb{.} <identifier> \bb{(} [ <expr> (\bb{,} <expr>)* ] \bb{)} \\
 % \vspace{-2mm}\\
 \hline
@@ -103,8 +104,8 @@ Jani Viherväs\\
     \mid \s    &<method\s invocation> \\
 <expr2>\s \to \s &\epsilon \mid \bb{[} <expr> \bb{]} \mid \bb{.length}\\
     \mid \s    &<binary\s operator> <expr> \\
-<new>\s \to \s &<simple\s type> \bb{\bracel} <expr> \bb{\bracer} \mid <type\s identifier> \bb{( )} \\ 
+<new>\s \to \s &<simple\s type> \bb{[} <expr> \bb{]} \mid <type\s identifier> \bb{( )} \\ 
 <binary\s operator>\s \to \s & \&\& \mid || \mid < \mid > \mid == \mid + \mid - \mid * \mid / \mid \% 
 \end{align*}
-
+\endgroup
 \end{document}
