@@ -36,13 +36,7 @@ namespace FrontEnd
             _tokens = tokens;
             _i = 0;
             //var rootNode = Statements();
-            try
-            {
-                Program();
-            }
-            catch (GrammarException)
-            {
-            }
+            Program();
             if ( 0 < _syntaxErrors.Count )
             {
                 throw new GrammarException(_syntaxErrors);
@@ -81,7 +75,7 @@ namespace FrontEnd
         /// </summary>
         /// <param name="token">Token to check</param>
         /// <param name="lexeme">Lexeme expected</param>
-        private bool CheckToken(Token token, params string[] lexeme)
+        private static bool CheckToken(Token token, params string[] lexeme)
         {
             return token != null && lexeme.Any(s => token.Lexeme == s);
         }
@@ -94,10 +88,8 @@ namespace FrontEnd
         private void CheckTokenAndSkip(string lexeme, params string[] followSet)
         {
             var token = NextToken();
-            if (!CheckToken(token, lexeme))
-            {
-                AddSyntaxError(token, lexeme);
-            }
+            if (CheckToken(token, lexeme)) return;
+            AddSyntaxError(token, lexeme);
             SkipTokens(followSet);
         }
 
@@ -282,7 +274,6 @@ namespace FrontEnd
                     CheckTokenAndSkip(Operators.Comma);
                 }
             } while (!CheckToken(CurrentToken(), Operators.ParenthesisRight));
-            NextToken();
         }
 
         private void TypeProduction()
@@ -345,12 +336,13 @@ namespace FrontEnd
                         CheckTokenAndSkip(Operators.ParenthesisLeft);
                         Expr();
                         CheckTokenAndSkip(Operators.ParenthesisRight);
+                        CheckTokenAndSkip(ReservedKeywords.Semicolon);
                         return;
                     }
                 case Operators.BraceLeft:
                     {
-                        _i--;
-                        while (!CheckToken(NextToken(), Operators.BraceRight))
+                        //_i--;
+                        while (!CheckToken(CurrentToken(), Operators.BraceRight))
                         {
                             Statement();
                         }
@@ -383,32 +375,41 @@ namespace FrontEnd
                         CheckTokenAndSkip(Operators.ParenthesisLeft);
                         Expr();
                         CheckTokenAndSkip(Operators.ParenthesisRight);
-                        CheckTokenAndSkip(ReservedKeywords.Semicolon);
+                        CheckTokenAndSkip(ReservedKeywords.Semicolon, Operators.BraceRight, ReservedKeywords.Else); // TODO: skip to next statement
                         return;
                     }
                 case ReservedKeywords.Return: 
                     {
                         Expr();
                         CheckTokenAndSkip(ReservedKeywords.Semicolon);
-                        if (!CheckToken(token, Operators.BraceRight))
+                        if (!CheckToken(CurrentToken(), Operators.BraceRight))
                         {
-                            // TODO: add error because of unreachable code after return
+                            // TODO: add warning because of unreachable code after return
                             SkipTokens(Operators.BraceRight);
                         }
                         return;
                     }
             }
-            if (IsTypeToken(token))
+            if ( token is TokenIdentifier && CheckToken(CurrentToken(), ReservedKeywords.Assignment, Operators.BracketLeft) )
             {
-                LocalVariableDeclaration();
-                return;
-            }
-            if (token is TokenIdentifier && CheckToken(CurrentToken(), ReservedKeywords.Assignment))
-            {
+                _i--;
                 Identifier();
-                NextToken(); // CurrentToken = token + 1, already checked in the condition
+                if (CheckToken(CurrentToken(), Operators.BracketLeft))
+                {
+                    NextToken();
+                    Expr();
+                    CheckTokenAndSkip(Operators.BracketRight);
+                }
+                //NextToken(); // CurrentToken.lexeme === "="
+                CheckTokenAndSkip(ReservedKeywords.Assignment);
                 Expr();
                 CheckTokenAndSkip(ReservedKeywords.Semicolon);
+                return;
+            }
+            if ( IsTypeToken(token) )
+            {
+                _i--;
+                LocalVariableDeclaration();
                 return;
             }
             _i--;
@@ -430,19 +431,30 @@ namespace FrontEnd
 
         private void MethodInvocation()
         {
-            Expr();
+            Expr1();
             CheckTokenAndSkip(Operators.Dot);
+            MethodTail();
+        }
+
+        private void MethodTail()
+        {
+            if (CheckToken(CurrentToken(), ReservedKeywords.Length))
+            {
+                NextToken();
+                return;
+            }
             Identifier();
             CheckTokenAndSkip(Operators.ParenthesisLeft);
-            while (!CheckToken(CurrentToken(), Operators.ParenthesisRight))
+            while ( !CheckToken(CurrentToken(), Operators.ParenthesisRight) )
             {
                 Expr();
-                if (!CheckToken(CurrentToken(), Operators.ParenthesisRight))
+                if ( !CheckToken(CurrentToken(), Operators.ParenthesisRight) )
                 {
                     CheckTokenAndSkip(Operators.Comma);
                 }
             }
             NextToken();
+
         }
 
         private void Expr()
@@ -471,6 +483,11 @@ namespace FrontEnd
                         Expr();
                         return;
                     }
+                case Operators.Minus:
+                    {
+                        Expr();
+                        return;
+                    }
                 case Operators.ParenthesisLeft:
                     {
                         Expr();
@@ -490,8 +507,11 @@ namespace FrontEnd
             {
                 return;
             }
-            _i--;
-            MethodInvocation();
+            if (token is TokenIdentifier)
+            {
+                _i--;
+                Identifier();
+            }
         }
 
         private void Expr2()
@@ -499,6 +519,7 @@ namespace FrontEnd
             var token = NextToken();
             if (CheckToken(token, Operators.ParenthesisRight, ReservedKeywords.Semicolon, Operators.BracketRight)) // epsilon
             {
+                _i--;
                 return;
             }
             if (token == null)
@@ -517,15 +538,11 @@ namespace FrontEnd
                     }
                 case Operators.Dot:
                     {
-                        if (CurrentToken() is TokenIdentifier) // method invocation
-                        {
-                            _i--;
-                            return;
-                        }
-                        CheckTokenAndSkip(ReservedKeywords.Length);
+                        MethodTail();
                         return;
                     }
             }
+            _i--;
             BinaryOperator();
         }
 

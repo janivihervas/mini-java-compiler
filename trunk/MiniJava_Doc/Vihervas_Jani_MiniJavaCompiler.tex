@@ -81,28 +81,29 @@ Jani Viherväs\\
 <type\s identifier>\s \to \s &<identifier> \\
 % \vspace{-2mm}\\
 \hline
-<statement>\s \to \s &\bb{assert (} <expr> \bb{)}  \\
+<statement>\s \to \s &\bb{assert (} <expr> \bb{);}  \\
              \mid \s &<local\s variable\s declaration>  \\
              \mid \s &\bb{\bracel <statement>* \bracer}  \\
              \mid \s &\bb{if (} <expr> \bb{)} <statement> <else> \\
              \mid \s &\bb{while (} <expr> \bb{)} <statement>  \\
              \mid \s &\bb{System.out.println (} <expr> \bb{);}  \\
-             \mid \s &<identifier> \bb{=} <expr> \bb{;}  \\
+             \mid \s &<identifier>[\bb{[}<epxr>\bb{]}] \bb{=} <expr> \bb{;}  \\
              \mid \s &\bb{return} <expr> \bb{;}  \\
              \mid \s &<method\s invocation> \bb{;} \\
 <else>\s \to \s &\epsilon \mid \bb{else} <statement> \\
 <local\s variable\s declaration> \s \to \s &<variable\s declaration> \\
-<method\s invocation>\s \to \s &<expr> \bb{.} <identifier> \bb{(} [ <expr> (\bb{,} <expr>)* ] \bb{)} \\
+<method\s invocation>\s \to \s &<expr1> \bb{.} <method\s tail>  \\
+<method\s tail>\s \to \s &\bb{length} \mid <identifier> \bb{(} [ <expr> (\bb{,} <expr>)* ] \bb{)} \\
 % \vspace{-2mm}\\
 \hline
 <expr>\s \to \s &<expr1><expr2> \\
 <expr1>\s \to \s &\bb{new} <new>\\
     \mid \s    &\bb{!} <expr> \\
+    \mid \s    &\bb{-} <expr> \\
     \mid \s    &\bb{(} <expr> \bb{)} \\
     \mid \s    &<identifier> \mid <integer\s literal> \\
     \mid \s    &\bb{this} \mid \bb{true} \mid \bb{false} \\
-    \mid \s    &<method\s invocation> \\
-<expr2>\s \to \s &\epsilon \mid \bb{[} <expr> \bb{]} \mid \bb{.length}\\
+<expr2>\s \to \s &\epsilon \mid \bb{[} <expr> \bb{]} \mid \bb{.}<method\s tail>\\
     \mid \s    &<binary\s operator> <expr> \\
 <new>\s \to \s &<simple\s type> \bb{[} <expr> \bb{]} \mid <type\s identifier> \bb{( )} \\ 
 <binary\s operator>\s \to \s & \&\& \mid || \mid < \mid > \mid == \mid + \mid - \mid * \mid / \mid \% 
